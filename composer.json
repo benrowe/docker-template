@@ -1,0 +1,10 @@
+{
+    "name": "ben/myproject",
+    "authors": [
+        {
+            "name": "Ben Rowe",
+            "email": "ben.rowe.83@gmail.com"
+        }
+    ],
+    "require": {}
+}

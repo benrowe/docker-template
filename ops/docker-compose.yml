@@ -1,0 +1,70 @@
+version: '3'
+
+services:
+  web:
+    container_name: web
+    image: nginx:1.13.3-alpine
+    networks:
+      - web_tier
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ../:/code
+      - /code/ops/
+    depends_on:
+      - app
+    deploy:
+      resources:
+        limits:
+          memory: 40M
+  app:
+    container_name: app
+    build: ./php/
+    networks:
+      - web_tier
+      - app_tier
+    expose:
+      - '9000'
+    volumes:
+      - ../:/code
+      - /code/ops/
+    working_dir: /code
+    entrypoint: "/bin/sh -c"
+    command:
+      - "composer install -vvv && php-fpm"
+    env_file: ../.env
+    depends_on:
+      - db
+    deploy:
+      resources:
+        limits:
+          memory: 120M
+  db:
+    container_name: db
+    image: mysql:5.7.19
+    networks:
+      - app_tier
+      - db_tier
+    expose:
+      - '3306'
+    volumes:
+       - db_data:/var/lib/mysql
+    restart: always
+    env_file: ../.env
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+    deploy:
+      resources:
+        limits:
+          memory: 120M
+networks:
+  web_tier:
+    driver: bridge
+  app_tier:
+    driver: bridge
+  db_tier:
+    driver: bridge
+
+volumes:
+  db_data:
