@@ -47,6 +47,7 @@ services:
       - '3306'
     volumes:
        - db_data:/var/lib/mysql
+       - ./db:/etc/mysql/conf.d
     restart: always
     env_file: ../.env
 networks:
