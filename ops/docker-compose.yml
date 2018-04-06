@@ -27,19 +27,16 @@ services:
     expose:
       - '9000'
     volumes:
+      - ./php/settings.conf:/usr/local/etc/php-fpm.d/settings.conf
       - ../:/code
       - /code/ops/
     working_dir: /code
     entrypoint: "/bin/sh -c"
     command:
-      - "composer install -vvv && php-fpm"
+      - "php-fpm"
     env_file: ../.env
     depends_on:
       - db
-    deploy:
-      resources:
-        limits:
-          memory: 120M
   db:
     container_name: db
     image: mysql:5.7.19
@@ -52,12 +49,6 @@ services:
        - db_data:/var/lib/mysql
     restart: always
     env_file: ../.env
-    environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=yes
-    deploy:
-      resources:
-        limits:
-          memory: 120M
 networks:
   web_tier:
     driver: bridge
